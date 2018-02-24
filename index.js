@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Image, ImageBackground, Platform, StyleSheet, TouchableOpacity, View, ViewPropTypes } from 'react-native';
+import { Image, ImageBackground, Platform, StyleSheet, TouchableOpacity, View, ViewPropTypes, NativeModules } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Video from 'react-native-video'; // eslint-disable-line
 
 const BackgroundImage = ImageBackground || Image; // fall back to Image if RN < 0.46
-
 const styles = StyleSheet.create({
   preloadingPlaceholder: {
     backgroundColor: 'black',
@@ -86,6 +85,9 @@ const styles = StyleSheet.create({
 });
 
 export default class VideoPlayer extends Component {
+
+
+
   constructor(props) {
     super(props);
 
@@ -133,6 +135,14 @@ export default class VideoPlayer extends Component {
     }
   }
 
+  stop() {
+    //console.log('this in the video', this);
+    //this.player.seek(0);
+    this.setState({
+      isPlaying: false,
+    });
+  }
+
   onLayout(event) {
     const { width } = event.nativeEvent.layout;
     this.setState({
@@ -152,6 +162,9 @@ export default class VideoPlayer extends Component {
     }));
 
     this.hideControls();
+    if(this.props.onStartPress){
+      this.props.onStartPress(this);
+    };
   }
 
   onProgress(event) {
@@ -176,8 +189,6 @@ export default class VideoPlayer extends Component {
       this.player.dismissFullscreenPlayer();
     }
 
-    this.setState({ progress: 1 });
-
     this.player.seek(0);
     if (!this.props.loop) {
       this.setState({
@@ -196,14 +207,14 @@ export default class VideoPlayer extends Component {
   }
 
   onPlayPress() {
-    if (this.props.onPlayPress) {
-      this.props.onPlayPress();
-    }
-
+    console.log('onPlayPress :: videoComponent')
     this.setState({
       isPlaying: !this.state.isPlaying,
     });
     this.showControls();
+    if(this.props.onPlayPress){
+      this.props.onPlayPress();
+    };
   }
 
   onMutePress() {
@@ -214,7 +225,15 @@ export default class VideoPlayer extends Component {
   }
 
   onToggleFullScreen() {
-    this.player.presentFullscreenPlayer();
+    if(Platform.OS === "android")
+    {
+      var uri = this.props.video.uri;
+      NativeModules.BridgeModule.showFullscreen(uri);
+    }
+    else
+    {
+      this.player.presentFullscreenPlayer();
+    }
   }
 
   onSeekBarLayout({ nativeEvent }) {
@@ -281,10 +300,6 @@ export default class VideoPlayer extends Component {
   }
 
   hideControls() {
-    if (this.props.onHideControls) {
-      this.props.onHideControls();
-    }
-
     if (this.props.disableControlsAutoHide) {
       return;
     }
@@ -299,10 +314,6 @@ export default class VideoPlayer extends Component {
   }
 
   showControls() {
-    if (this.props.onShowControls) {
-      this.props.onShowControls();
-    }
-
     this.setState({
       isControlsVisible: true,
     });
@@ -435,15 +446,13 @@ export default class VideoPlayer extends Component {
             />
           </TouchableOpacity>
         )}
-        {(Platform.OS === 'android' || this.props.disableFullscreen) ? null : (
-          <TouchableOpacity onPress={this.onToggleFullScreen} style={customStyles.controlButton}>
-            <Icon
-              style={[styles.extraControl, customStyles.controlIcon]}
-              name="fullscreen"
-              size={32}
-            />
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity onPress={this.onToggleFullScreen} style={customStyles.controlButton}>
+          <Icon
+            style={[styles.extraControl, customStyles.controlIcon]}
+            name="fullscreen"
+            size={32}
+          />
+        </TouchableOpacity>
       </View>
     );
   }
@@ -536,10 +545,9 @@ VideoPlayer.propTypes = {
   autoplay: PropTypes.bool,
   defaultMuted: PropTypes.bool,
   muted: PropTypes.bool,
-  style: ViewPropTypes.style,
+  style: View.propTypes.style,
   controlsTimeout: PropTypes.number,
   disableControlsAutoHide: PropTypes.bool,
-  disableFullscreen: PropTypes.bool,
   loop: PropTypes.bool,
   resizeMode: Video.propTypes.resizeMode,
   hideControlsOnStart: PropTypes.bool,
@@ -548,20 +556,20 @@ VideoPlayer.propTypes = {
   pauseOnPress: PropTypes.bool,
   fullScreenOnLongPress: PropTypes.bool,
   customStyles: PropTypes.shape({
-    wrapper: ViewPropTypes.style,
+    wrapper: View.propTypes.style,
     video: Video.propTypes.style,
-    videoWrapper: ViewPropTypes.style,
-    controls: ViewPropTypes.style,
+    videoWrapper: View.propTypes.style,
+    controls: View.propTypes.style,
     playControl: TouchableOpacity.propTypes.style,
     controlButton: TouchableOpacity.propTypes.style,
     controlIcon: Icon.propTypes.style,
     playIcon: Icon.propTypes.style,
-    seekBar: ViewPropTypes.style,
-    seekBarFullWidth: ViewPropTypes.style,
-    seekBarProgress: ViewPropTypes.style,
-    seekBarKnob: ViewPropTypes.style,
-    seekBarKnobSeeking: ViewPropTypes.style,
-    seekBarBackground: ViewPropTypes.style,
+    seekBar: View.propTypes.style,
+    seekBarFullWidth: View.propTypes.style,
+    seekBarProgress: View.propTypes.style,
+    seekBarKnob: View.propTypes.style,
+    seekBarKnobSeeking: View.propTypes.style,
+    seekBarBackground: View.propTypes.style,
     thumbnail: Image.propTypes.style,
     playButton: TouchableOpacity.propTypes.style,
     playArrow: Icon.propTypes.style,
@@ -569,10 +577,6 @@ VideoPlayer.propTypes = {
   onEnd: PropTypes.func,
   onProgress: PropTypes.func,
   onLoad: PropTypes.func,
-  onStart: PropTypes.func,
-  onPlayPress: PropTypes.func,
-  onHideControls: PropTypes.func,
-  onShowControls: PropTypes.func,
 };
 
 VideoPlayer.defaultProps = {
