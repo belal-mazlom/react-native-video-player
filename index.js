@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Image, ImageBackground, Platform, StyleSheet, TouchableOpacity, View, NativeModules } from 'react-native';
+import { Image, ImageBackground, Platform, StyleSheet, TouchableOpacity, View, NativeModules, ViewPropTypes } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Video from 'react-native-video'; // eslint-disable-line
 
@@ -563,7 +563,7 @@ VideoPlayer.propTypes = {
   autoplay: PropTypes.bool,
   defaultMuted: PropTypes.bool,
   muted: PropTypes.bool,
-  style: View.propTypes.style,
+  style: ViewPropTypes.style,
   controlsTimeout: PropTypes.number,
   disableControlsAutoHide: PropTypes.bool,
   loop: PropTypes.bool,
@@ -574,20 +574,20 @@ VideoPlayer.propTypes = {
   pauseOnPress: PropTypes.bool,
   fullScreenOnLongPress: PropTypes.bool,
   customStyles: PropTypes.shape({
-    wrapper: View.propTypes.style,
+    wrapper: ViewPropTypes.style,
     video: Video.propTypes.style,
-    videoWrapper: View.propTypes.style,
-    controls: View.propTypes.style,
+    videoWrapper: ViewPropTypes.style,
+    controls: ViewPropTypes.style,
     playControl: TouchableOpacity.propTypes.style,
     controlButton: TouchableOpacity.propTypes.style,
     controlIcon: Icon.propTypes.style,
     playIcon: Icon.propTypes.style,
-    seekBar: View.propTypes.style,
-    seekBarFullWidth: View.propTypes.style,
-    seekBarProgress: View.propTypes.style,
-    seekBarKnob: View.propTypes.style,
-    seekBarKnobSeeking: View.propTypes.style,
-    seekBarBackground: View.propTypes.style,
+    seekBar: ViewPropTypes.style,
+    seekBarFullWidth: ViewPropTypes.style,
+    seekBarProgress: ViewPropTypes.style,
+    seekBarKnob: ViewPropTypes.style,
+    seekBarKnobSeeking: ViewPropTypes.style,
+    seekBarBackground: ViewPropTypes.style,
     thumbnail: Image.propTypes.style,
     playButton: TouchableOpacity.propTypes.style,
     playArrow: Icon.propTypes.style,
